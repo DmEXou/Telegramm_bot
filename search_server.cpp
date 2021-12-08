@@ -32,7 +32,7 @@ void SearchServer::AddDocument(int document_id, const std::string& document,
     const double inv_word_count = 1.0 / words.size();
     for (const std::string& word : words) {
         word_to_document_freqs_[word][document_id] += inv_word_count;
-
+        id_to_word_freq_[document_id][word] = 0;
     }
     documents_.emplace(document_id,
         DocumentData{

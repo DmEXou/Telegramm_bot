@@ -32,20 +32,22 @@ int main() {
     // слова из разных документов, не является дубликатом
     AddDocument(search_server, 9, "nasty rat with curly hair"s, DocumentStatus::ACTUAL, { 1, 2 });
 
+    for (auto ss : search_server) {
+        cout << ss << " ";
+    }
+    cout << endl;
     cout << "Before duplicates removed: "s << search_server.GetDocumentCount() << endl;
-//    RemoveDuplicates(search_server);
+    RemoveDuplicates(search_server);
     cout << "After duplicates removed: "s << search_server.GetDocumentCount() << endl;
     
-//    cout << search_server.GetWordFrequencies(1);
+    for (auto ss : search_server) {
+        cout << ss << " ";
+    }
 
-    for (auto a : search_server.GetWordFrequencies(3)) {
-        cout << a.first << " - " << a.second << endl;
-    }
-    cout << "--------------------" << endl;
-    for (auto a : search_server.GetWordFrequencies(1)) {
-        cout << a.first << " - " << a.second << endl;
-    }
-    cout << (search_server.GetWordFrequencies(1) == search_server.GetWordFrequencies(3));
+    //cout << "--------------------" << endl;
+    //for (auto a : search_server.GetWordFrequencies(1)) {
+    //    cout << a.first << " - " << a.second << endl;
+    //}
 
     //static auto a = search_server.GetWordFrequencies(1);
     //static auto b = search_server.GetWordFrequencies(3);
