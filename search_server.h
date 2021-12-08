@@ -59,9 +59,10 @@ public:
     auto end() const {
         return document_ids_.end();
     }
+    
     /////////////
     const std::map<string, double>& GetWordFrequencies(int document_id) const {
-        std::map<string, double> freqs_word = {};
+        static std::map<string, double> freqs_word = {};
         int counter_all_str = 0;
         for (const auto& tmp_map : word_to_document_freqs_) {
             counter_all_str += tmp_map.second.size();
@@ -75,7 +76,7 @@ public:
             freqs_word_elem.second /= counter_all_str;
         }
         return freqs_word;
-        //O(logN);//ƒумаю, что количество Ё“»’ слов, деленное на общее количество слов.
+//        //O(logN);//ƒумаю, что количество Ё“»’ слов, деленное на общее количество слов.
     }
     /////////////
     void RemoveDocument(int document_id) {
@@ -130,7 +131,8 @@ private:
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
     std::map<int, DocumentData> documents_;
     std::vector<int> document_ids_;
-    
+//    std::map<std::string, double> freqs_word_;
+
 private:
     const int MaxResultDocumentCount = 5;
 };
