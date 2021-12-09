@@ -62,8 +62,9 @@ public:
     
     /////////////
     const std::map<string, double>& GetWordFrequencies(int document_id) const {
+        static const map<string, double>& a = {};
         if (!id_to_word_freq_.at(document_id).empty()) return id_to_word_freq_.at(document_id);
-        else return {};
+        else return a;
 
         //O(logN);//ƒумаю, что количество Ё“»’ слов, деленное на общее количество слов.
     }
@@ -71,10 +72,11 @@ public:
     void RemoveDocument(int document_id) {
         auto it = lower_bound(document_ids_.begin(), document_ids_.end(), document_id);
         document_ids_.erase(it);
-        auto itm = lower_bound(documents_.begin(), documents_.end(), [document_id](auto doc_tmp, auto a) {///
+        auto itm = find_if(documents_.begin(), documents_.end(), [document_id](auto doc_tmp) {///
             return doc_tmp.first == document_id;
             });
         documents_.erase(itm);
+        word_to_document_freqs_;///////////
     }
     ///O(WlogN)
     /////////////
