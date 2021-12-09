@@ -36,8 +36,8 @@ public:
                     return lhs.relevance > rhs.relevance;
                 }
             });
-        if (result_search.size() > MaxResultDocumentCount) {
-            result_search.resize(MaxResultDocumentCount);
+        if (result_search.size() > kMaxResultDocumentCount) {
+            result_search.resize(kMaxResultDocumentCount);
         }
         return result_search;
     }
@@ -52,34 +52,18 @@ public:
 
     int GetDocumentCount() const;
 
-    auto begin() const {
+    const auto begin() const {
         return document_ids_.begin();
     }
-
-    auto end() const {
+    
+    const auto end() const {
         return document_ids_.end();
     }
     
-    /////////////
-    const std::map<string, double>& GetWordFrequencies(int document_id) const {
-        static const map<string, double>& a = {};
-        if (!id_to_word_freq_.at(document_id).empty()) return id_to_word_freq_.at(document_id);
-        else return a;
+    const std::map<string, double>& GetWordFrequencies(int document_id) const;
 
-        //O(logN);//ƒумаю, что количество Ё“»’ слов, деленное на общее количество слов.
-    }
-    /////////////
-    void RemoveDocument(int document_id) {
-        auto it = lower_bound(document_ids_.begin(), document_ids_.end(), document_id);
-        document_ids_.erase(it);
-        auto itm = find_if(documents_.begin(), documents_.end(), [document_id](auto doc_tmp) {///
-            return doc_tmp.first == document_id;
-            });
-        documents_.erase(itm);
-        word_to_document_freqs_;///////////
-    }
-    ///O(WlogN)
-    /////////////
+    void RemoveDocument(int document_id);
+
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query,
         int document_id) const;
     
@@ -127,5 +111,5 @@ private:
     std::map<int, std::map<std::string, double>> id_to_word_freq_;
 
 private:
-    const int MaxResultDocumentCount = 5;
+    const int kMaxResultDocumentCount = 5;
 };

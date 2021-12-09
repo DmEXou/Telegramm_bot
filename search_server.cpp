@@ -83,6 +83,21 @@ int SearchServer::GetDocumentCount() const {
     return documents_.size();
 }
 
+const std::map<string, double>& SearchServer::GetWordFrequencies(int document_id) const {
+    static const map<string, double>& a = {};
+    if (!id_to_word_freq_.at(document_id).empty()) return id_to_word_freq_.at(document_id);
+    else return a;
+}
+
+void SearchServer::RemoveDocument(int document_id) {
+    auto it = lower_bound(document_ids_.begin(), document_ids_.end(), document_id);
+    document_ids_.erase(it);
+    auto itm = find_if(documents_.begin(), documents_.end(), [document_id](auto doc_tmp) {///
+        return doc_tmp.first == document_id;
+        });
+    documents_.erase(itm);
+}
+
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query,
     int document_id) const {
     const Query query = ParseQuery(raw_query);
