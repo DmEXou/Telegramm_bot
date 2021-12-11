@@ -2,12 +2,8 @@
 #include <algorithm>
 #include <map>
 
-#include <iostream>///
-
 #include "document_status.h"
 #include "string_processing.h"
-
-using namespace std;///
 
 class SearchServer {
 public:
@@ -60,13 +56,13 @@ public:
         return document_ids_.end();
     }
     
-    const std::map<string, double>& GetWordFrequencies(int document_id) const;
+    const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
 
     void RemoveDocument(int document_id);
 
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query,
         int document_id) const;
-    
+
 private:
     
     struct DocumentData {

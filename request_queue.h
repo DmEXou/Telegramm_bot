@@ -5,11 +5,14 @@
 
 class RequestQueue {
 public:
-    RequestQueue(SearchServer search_server);
+    RequestQueue(SearchServer& search_server)
+    {
+        search_server_ = &search_server;
+    }
 
     template <typename DocumentPredicate>
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate document_predicate) {
-        std::vector<Document> result_search = search_server_.FindTopDocuments(raw_query, document_predicate);
+        std::vector<Document> result_search = search_server_->FindTopDocuments(raw_query, document_predicate);
         UpdateQueue(result_search, raw_query);
         return result_search;
     }
@@ -44,7 +47,7 @@ private:
     void RemoveInQueue();
 
 private:
-    SearchServer search_server_;
+    SearchServer* search_server_;
     std::deque<QueryResult> requests_;
     int empty_request_ = 0;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 
+#include "log_duration.h"
 #include "paginator.h"
 #include "request_queue.h"
 

@@ -1,10 +1,5 @@
 #include "request_queue.h"
 
-RequestQueue::RequestQueue(SearchServer search_server)
-    : search_server_(search_server)
-{
-}
-
 int RequestQueue::GetNoResultRequests() const {
     return empty_request_;
 }

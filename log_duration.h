@@ -1,7 +1,5 @@
 #pragma once
-
 #include <chrono>
-//#include <iostream>
 
 #define PROFILE_CONCAT_INTERNAL(X, Y) X##Y
 #define PROFILE_CONCAT(X, Y) PROFILE_CONCAT_INTERNAL(X, Y)
@@ -20,8 +18,8 @@ public:
         using namespace std::literals;
 
         const auto end_time = Clock::now();
-        const auto dur = end_time - start_time_;
-        std::cerr << id_ << ": "s << duration_cast<milliseconds>(dur).count() << " ms"s << std::endl;
+        const auto duration = end_time - start_time_;
+        std::cerr << id_ << ": "s << duration_cast<milliseconds>(duration).count() << " ms"s << std::endl;
     }
 
 private:
