@@ -1,0 +1,122 @@
+#include <string>
+#include <iostream>
+#include <iterator>
+#include <cassert>
+
+using namespace std;//
+
+class Editor
+{
+public:
+    Editor() {
+        s_ = 0;
+    };
+    ~Editor() {};
+
+    void Left() {
+        assert(s_ > 0);
+        --s_;
+    }
+    // сдвинуть курсор вправо 
+    void Right() {
+        assert(s_ < str_.size());
+        ++s_;
+    }
+    // вставить символ token
+    void Insert(char token) {
+        s_++;
+        str_.push_back(token);
+    }
+    // вырезать не более tokens символов, начиная с текущей позиции курсора
+    void Cut(size_t tokens = 1) {
+        buf_.clear();
+        auto it = str_.begin();
+        it = it + s_;
+
+        
+
+        auto itp = it + tokens;
+        //cout << s_ins();
+        for (it; it != itp; ++it) {
+            buf_+= *it;
+        }
+        str_.erase(s_, tokens);
+    }
+    // cкопировать не более tokens символов, начиная с текущей позиции курсора
+    void Copy(size_t tokens = 1) {
+
+    }
+    // вставить содержимое буфера в текущую позицию курсора
+    void Paste() {
+        for (int i = 0; i < buf_.size(); ++i) {
+            s_++;
+            str_ += buf_[i];
+        }
+        buf_.clear();
+    }
+    // получить текущее содержимое текстового редактора
+    string GetText() const {
+        return str_;
+    }
+
+    int s_ins() {
+        return s_;
+    }
+
+private:
+    int s_;
+    string str_;
+    string buf_;
+
+};
+
+
+int main() {
+    Editor editor;
+    const string text = "hello, world"s;
+    for (char c : text) {
+        editor.Insert(c);//Странная хрень
+    }
+
+    //cout << editor.s_ins();
+
+    // Текущее состояние редактора: `hello, world|`
+    for (size_t i = 0; i < text.size(); ++i) {
+        editor.Left();
+    }
+
+    //cout << editor.s_ins();
+
+    // Текущее состояние редактора: `|hello, world`
+    editor.Cut(7);
+    //cout << editor.s_ins();
+
+    // Текущее состояние редактора: `|world`
+    // в буфере обмена находится текст `hello, `
+    for (size_t i = 0; i < 5; ++i) {
+        editor.Right();
+    }
+    //cout << editor.s_ins();
+
+    // Текущее состояние редактора: `world|`
+    editor.Insert(',');
+    editor.Insert(' ');
+
+    //cout << editor.s_ins() << " ";
+
+    // Текущее состояние редактора: `world, |`
+    editor.Paste();
+
+    //cout << editor.s_ins() << " ";
+    // Текущее состояние редактора: `world, hello, |`
+    editor.Left();
+    editor.Left();
+
+    //cout << editor.s_ins();
+
+    //Текущее состояние редактора: `world, hello|, `
+    editor.Cut(3);  // Будут вырезаны 2 символа
+    // Текущее состояние редактора: `world, hello|`
+    cout << editor.GetText();
+    return 0;
+}
