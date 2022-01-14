@@ -14,44 +14,56 @@ public:
     ~Editor() {};
 
     void Left() {
-        assert(s_ > 0);
+        assert(s_ >= 0);
         --s_;
     }
     // сдвинуть курсор вправо 
     void Right() {
-        assert(s_ < str_.size());
         ++s_;
     }
     // вставить символ token
     void Insert(char token) {
-        s_++;
-        str_.push_back(token);
+        auto it = str_.begin();
+        it += s_;
+        str_.insert(it, token);
+        ++s_;
     }
     // вырезать не более tokens символов, начиная с текущей позиции курсора
     void Cut(size_t tokens = 1) {
         buf_.clear();
+        int provleg = s_ + tokens;
+        if (provleg > str_.length()) {
+            tokens = str_.length() - s_;
+        }
+        //cout << s_ << " - " << str_.length();
         auto it = str_.begin();
         it = it + s_;
-
-        
-
         auto itp = it + tokens;
+
         //cout << s_ins();
-        for (it; it != itp; ++it) {
-            buf_+= *it;
+        for (; it != itp; ++it) {
+            buf_ += *it;
         }
         str_.erase(s_, tokens);
     }
     // cкопировать не более tokens символов, начиная с текущей позиции курсора
     void Copy(size_t tokens = 1) {
-
+        buf_.clear();
+        int provleg = s_ + tokens;
+        if (provleg > str_.length()) {
+            tokens = str_.length() - s_;
+        }
+        auto it = str_.begin();
+        it = it + s_;
+        for (size_t i = 0; i < tokens; ++i) {
+            buf_ += *it;
+            ++it;
+        }
     }
     // вставить содержимое буфера в текущую позицию курсора
     void Paste() {
-        for (int i = 0; i < buf_.size(); ++i) {
-            s_++;
-            str_ += buf_[i];
-        }
+        str_.insert(s_, buf_);
+        s_ += buf_.size();
         buf_.clear();
     }
     // получить текущее содержимое текстового редактора
@@ -75,7 +87,7 @@ int main() {
     Editor editor;
     const string text = "hello, world"s;
     for (char c : text) {
-        editor.Insert(c);//Странная хрень
+        editor.Insert(c);
     }
 
     //cout << editor.s_ins();
@@ -107,16 +119,24 @@ int main() {
     // Текущее состояние редактора: `world, |`
     editor.Paste();
 
-    //cout << editor.s_ins() << " ";
+    cout << editor.s_ins() << " ";
     // Текущее состояние редактора: `world, hello, |`
+    //cout << editor.GetText() << endl;
     editor.Left();
     editor.Left();
 
     //cout << editor.s_ins();
-
+    //cout << editor.GetText() << " - " << editor.s_ins() << endl;
     //Текущее состояние редактора: `world, hello|, `
+    cout << editor.GetText() << endl;
     editor.Cut(3);  // Будут вырезаны 2 символа
-    // Текущее состояние редактора: `world, hello|`
-    cout << editor.GetText();
+    cout << editor.GetText() << endl;
+    editor.Left();
+    editor.Left();
+    editor.Left();
+    editor.Copy(2);
+    editor.Left();
+    editor.Paste();
+    cout << editor.GetText() << endl;
     return 0;
 }
