@@ -1,142 +1,41 @@
 #include <string>
-#include <iostream>
-#include <iterator>
+#include <map>
 #include <cassert>
+#include <iostream>
 
-using namespace std;//
-
-class Editor
-{
+using namespace std;
+class Translator {
 public:
-    Editor() {
-        s_ = 0;
+    void Add(string_view source, string_view target) {
+        trans.insert(make_pair( source, target ));
+        transre.insert(make_pair(target, source));
     };
-    ~Editor() {};
-
-    void Left() {
-        assert(s_ >= 0);
-        --s_;
+    string_view TranslateForward(string_view source) const {
+        return trans.at(source);
     }
-    // сдвинуть курсор вправо 
-    void Right() {
-        ++s_;
-    }
-    // вставить символ token
-    void Insert(char token) {
-        auto it = str_.begin();
-        it += s_;
-        str_.insert(it, token);
-        ++s_;
-    }
-    // вырезать не более tokens символов, начиная с текущей позиции курсора
-    void Cut(size_t tokens = 1) {
-        buf_.clear();
-        int provleg = s_ + tokens;
-        if (provleg > str_.length()) {
-            tokens = str_.length() - s_;
-        }
-        //cout << s_ << " - " << str_.length();
-        auto it = str_.begin();
-        it = it + s_;
-        auto itp = it + tokens;
-
-        //cout << s_ins();
-        for (; it != itp; ++it) {
-            buf_ += *it;
-        }
-        str_.erase(s_, tokens);
-    }
-    // cкопировать не более tokens символов, начиная с текущей позиции курсора
-    void Copy(size_t tokens = 1) {
-        buf_.clear();
-        int provleg = s_ + tokens;
-        if (provleg > str_.length()) {
-            tokens = str_.length() - s_;
-        }
-        auto it = str_.begin();
-        it = it + s_;
-        for (size_t i = 0; i < tokens; ++i) {
-            buf_ += *it;
-            ++it;
-        }
-    }
-    // вставить содержимое буфера в текущую позицию курсора
-    void Paste() {
-        str_.insert(s_, buf_);
-        s_ += buf_.size();
-        buf_.clear();
-    }
-    // получить текущее содержимое текстового редактора
-    string GetText() const {
-        return str_;
-    }
-
-    int s_ins() {
-        return s_;
+    string_view TranslateBackward(string_view target) const {
+        return transre.at(target);
     }
 
 private:
-    int s_;
-    string str_;
-    string buf_;
-
+    map<string_view, string_view> trans;
+    map<string_view, string_view> transre;
 };
 
+void TestSimple() {
+    Translator translator;
+    translator.Add(string("okno"s), string("window"s));
+    translator.Add(string("stol"s), string("table"s));
+    string_view str("okno"s);
+    string str_nov(str);
+    cout << str_nov << endl;
+
+    //assert(translator.TranslateForward("okno"s) == "window"s);
+    //assert(translator.TranslateBackward("table"s) == "stol"s);
+    //assert(translator.TranslateForward("table"s) == ""s);
+}
 
 int main() {
-    Editor editor;
-    const string text = "hello, world"s;
-    for (char c : text) {
-        editor.Insert(c);
-    }
-
-    //cout << editor.s_ins();
-
-    // Текущее состояние редактора: `hello, world|`
-    for (size_t i = 0; i < text.size(); ++i) {
-        editor.Left();
-    }
-
-    //cout << editor.s_ins();
-
-    // Текущее состояние редактора: `|hello, world`
-    editor.Cut(7);
-    //cout << editor.s_ins();
-
-    // Текущее состояние редактора: `|world`
-    // в буфере обмена находится текст `hello, `
-    for (size_t i = 0; i < 5; ++i) {
-        editor.Right();
-    }
-    //cout << editor.s_ins();
-
-    // Текущее состояние редактора: `world|`
-    editor.Insert(',');
-    editor.Insert(' ');
-
-    //cout << editor.s_ins() << " ";
-
-    // Текущее состояние редактора: `world, |`
-    editor.Paste();
-
-    cout << editor.s_ins() << " ";
-    // Текущее состояние редактора: `world, hello, |`
-    //cout << editor.GetText() << endl;
-    editor.Left();
-    editor.Left();
-
-    //cout << editor.s_ins();
-    //cout << editor.GetText() << " - " << editor.s_ins() << endl;
-    //Текущее состояние редактора: `world, hello|, `
-    cout << editor.GetText() << endl;
-    editor.Cut(3);  // Будут вырезаны 2 символа
-    cout << editor.GetText() << endl;
-    editor.Left();
-    editor.Left();
-    editor.Left();
-    editor.Copy(2);
-    editor.Left();
-    editor.Paste();
-    cout << editor.GetText() << endl;
+    TestSimple();
     return 0;
 }
