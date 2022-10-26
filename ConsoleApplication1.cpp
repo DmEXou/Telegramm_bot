@@ -1,14 +1,13 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <string>
 #include <sstream>
 #include <iostream>
-#include <map>
+#include <unordered_map>
+#include <set>
 #include <ctime>
 #include <vector>
-#include <locale>
-#include <codecvt>
-//#include <UTF8-CPP.h>
+#include <algorithm>
 
 #include <curl.h>
 
@@ -29,7 +28,6 @@ public:
     string out_str(const string& adres, const int line_n) {
 
         string readBuffer_UTF8;
-
         CURL* curl;
         CURLcode res_inter;
         curl = curl_easy_init();
@@ -43,6 +41,7 @@ public:
         else {
             //ERROR!!!
         }
+
         stringstream stream_to_need_line;
 
         stream_to_need_line << readBuffer_UTF8;
@@ -57,8 +56,6 @@ public:
                 break;
             }
         }
-
-
 
         return ssbufer;
     }
@@ -103,7 +100,7 @@ public:
                             base.push_back(tmp);
                         }
                     }
-                    else if(tmp.first.mon > date.mon){
+                    else if (tmp.first.mon > date.mon) {
                         count++;
                         base.push_back(tmp);
                     }
@@ -148,10 +145,35 @@ private:
     work_date date;
 };
 
+class Search_off {
+public:
+    Search_off(const string& str) {
+        if (str.find("1127403") != string::npos) result.insert("Shagonar"s);
+        if (str.find("1127336") != string::npos) result.insert("Shagonar"s);
+        if (str.find("314113") != string::npos) result.insert("Bazhyn-Alaak"s);
+        if (str.find("21628") != string::npos) result.insert("Sug-Aksy"s);
+        if (str.find("314259") != string::npos) result.insert("Chadan"s);
+        if (str.find("1127411") != string::npos) result.insert("Chaa-Khol"s);
+        if (!result.empty()) check = true;
+    }
+
+    set<string> Get_result() {
+        return result;
+    }
+
+    bool Get_check() {
+        return check;
+    }
+
+private:
+    set<string> result;
+    bool check = false;
+};
+
 int main(void)
 {
-    setlocale(LC_ALL, "");
-
+    //std::setlocale(LC_CTYPE, "en_US.UTF-8");
+    
     HTML_reader object;
     string adress = "http://www.tuvaenergo.ru/clients/offlist_p/index.php";
     auto str = object.out_str(adress, 1586);
@@ -162,12 +184,15 @@ int main(void)
 
     Str_Parser parser(str);
     parser.parser();
-    vector<int> tmp_test;
+
+    vector<pair<work_date, set<string>>> date_name_off_elec;
     adress = "http://www.tuvaenergo.ru/clients/offlist_p/pof.php?dt=";
     for (const auto& pair : parser.get_base()) {
         string tmp = adress + pair.second;
-        //tmp_test.push_back(object.out_str(tmp, 1587).find("р-н Дзун-Хемчикский, г Чадан, ул Шахтерская"));
-        cout << object.out_str(tmp, 1587) << endl;
+        Search_off oblect_off(object.out_str(tmp, 1587));
+        if (oblect_off.Get_check()) {
+            date_name_off_elec.push_back(make_pair(pair.first, oblect_off.Get_result()));
+        }
     }
 
     return 0;
