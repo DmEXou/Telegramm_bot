@@ -1,13 +1,13 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include <string>
 #include <sstream>
-#include <iostream>
-#include <unordered_map>
+#include <iostream>//
 #include <set>
+#include <map>
 #include <ctime>
 #include <vector>
-#include <algorithm>
+#include <algorithm>//
 
 #include <curl.h>
 
@@ -21,6 +21,10 @@ struct work_date {
     int mon = 0;
     int year = 0;
 };
+
+string to_str(const work_date& date) {
+    return string(to_string(date.day) + '.' + to_string(date.mon) + '.' + to_string(date.year));
+}
 
 class HTML_reader {
 public:
@@ -185,15 +189,14 @@ int main(void)
     Str_Parser parser(str);
     parser.parser();
 
-    vector<pair<work_date, set<string>>> date_name_off_elec;
+    map<string, set<string>> date_name_off_elec;
     adress = "http://www.tuvaenergo.ru/clients/offlist_p/pof.php?dt=";
     for (const auto& pair : parser.get_base()) {
         string tmp = adress + pair.second;
         Search_off oblect_off(object.out_str(tmp, 1587));
         if (oblect_off.Get_check()) {
-            date_name_off_elec.push_back(make_pair(pair.first, oblect_off.Get_result()));
+            date_name_off_elec[to_str(pair.first)] = oblect_off.Get_result();
         }
     }
-
     return 0;
 }
