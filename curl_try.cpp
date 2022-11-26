@@ -3,6 +3,7 @@
 #include <future>
 #include <map>
 #include <set>
+#include <string>
 
 #include <tgbot/tgbot.h>
 #include <curl/curl.h>
@@ -222,21 +223,23 @@ public:
             while (true) {
                 time_t rawtime;
                 time(&rawtime);
-                cout << "Hours " << localtime(&rawtime)->tm_hour << endl;
+                //cout << "Hours " << localtime(&rawtime)->tm_hour << endl;
                 if (localtime(&rawtime)->tm_hour % 6 == 0 && flag_time) {
-                    cout << " rebuild and flag false ";
+                    cout << " rebuild and flag false.\n";
                     base_off = rebuild();
                     flag_time = false;
                 }
                 if (localtime(&rawtime)->tm_hour % 6 != 0 && !flag_time) { 
-                    cout << " flag true ";
+                    cout << " flag true.\n";
                     flag_time = true;
                 }
                 longPoll.start();
             }
         }
         catch (TgBot::TgException& e) {
-            printf("error: %s\n", e.what());
+	    time_t rawtime;
+	    time(&rawtime);
+            cout << "error: %s\n" << e.what() << " - " << localtime(&rawtime)->tm_mday << " " << localtime(&rawtime)->tm_hour << ":" << localtime(&rawtime)->tm_min << endl;
         }
     }
 
