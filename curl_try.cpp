@@ -148,7 +148,7 @@ public:
         if (str.find("21628") != string::npos) result.insert("Sug-Aksy"s);
         if (str.find("314259") != string::npos) result.insert("Chadan"s);
         if (str.find("1127411") != string::npos) result.insert("Chaa-Khol"s);
-        if (!result.empty()) check = true;
+        if (!result.empty()) check = true; // Коздать метод возвращающий result.empty(); Отдельно избавится от Флага!!!
     }
 
     set<string> Get_result() {
