@@ -27,7 +27,7 @@ class HTML_reader {
 public:
 
     string out_str(const string& adres, const int line_n) {
-        string* readBuffer_UTF8 = new string;
+        string* readBuffer_UTF8 = new string; // Достаточно стека.
         readBuffer_UTF8->reserve(82000);
         CURL* curl;
         CURLcode res_inter;
