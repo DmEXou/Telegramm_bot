@@ -24,18 +24,19 @@ string to_str(const work_date& date) {
 map<string, set<string>> rebuild(); // Форвард деклорейшон:)
 
 class HTML_reader {
-public:
+public:\
 
     string out_str(const string& adres, const int line_n) {
-        string* readBuffer_UTF8 = new string; // Достаточно стека.
-        readBuffer_UTF8->reserve(82000);
+        string readBuffer_UTF8; // Достаточно стека.
+        readBuffer_UTF8.reserve(82000);
         CURL* curl;
         CURLcode res_inter;
         curl = curl_easy_init();
+
         if (curl) {
             curl_easy_setopt(curl, CURLOPT_URL, adres.data());
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &*readBuffer_UTF8);//
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer_UTF8);//
             res_inter = curl_easy_perform(curl);
             curl_easy_cleanup(curl);
         }
@@ -47,10 +48,9 @@ public:
         }
 
         for (size_t i = 0; i < line_n - 1; ++i) {
-            readBuffer_UTF8->erase(0, readBuffer_UTF8->find('\n') + 1);
+            readBuffer_UTF8.erase(0, readBuffer_UTF8.find('\n') + 1);
         }
-        auto result = readBuffer_UTF8->substr(0, readBuffer_UTF8->find('\n'));
-        delete(readBuffer_UTF8);
+        auto result = readBuffer_UTF8.substr(0, readBuffer_UTF8.find('\n'));
         return result;
     }
 
@@ -148,6 +148,7 @@ public:
         if (str.find("21628") != string::npos) result.insert("Sug-Aksy"s);
         if (str.find("314259") != string::npos) result.insert("Chadan"s);
         if (str.find("1127411") != string::npos) result.insert("Chaa-Khol"s);
+        if (str.find("21842") != string::npos) result.insert("Chaa-Khol"s);
         if (!result.empty()) check = true; // Коздать метод возвращающий result.empty(); Отдельно избавится от Флага!!!
     }
 
@@ -272,7 +273,7 @@ private:
 map<string, set<string>> rebuild() {
     HTML_reader object;
     string adress = "http://www.tuvaenergo.ru/clients/offlist_p/index.php";
-    auto str_dates = object.out_str(adress, 1586);
+    auto str_dates = object.out_str(adress, 1612);
     if (str_dates.empty()) {
         cout << "ERROR - String is empty.";
         return {};
@@ -286,7 +287,7 @@ map<string, set<string>> rebuild() {
     vector<string> date;
     for (const auto& pair : parser.get_base()) { // Может быть стоит добавить mutex!!!
         string tmp_adress = adress + pair.second;
-        future_bufer.push_back(async(&HTML_reader::out_str, &object, tmp_adress, 1587));//
+        future_bufer.push_back(async(&HTML_reader::out_str, &object, tmp_adress, 1613));//
         date.push_back(to_str(pair.first));
     }
     for (int i = 0; i < future_bufer.size(); ++i) {
