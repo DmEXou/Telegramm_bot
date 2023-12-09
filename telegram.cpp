@@ -8,6 +8,7 @@
 
 class Crow_pars {
 public:
+	/*
     Crow_pars() {
         std::string readBuffer_UTF8;
         readBuffer_UTF8.reserve(82000);
@@ -25,10 +26,30 @@ public:
         if (!readBuffer_UTF8.empty()) {
             data_json = nlohmann::json::parse(readBuffer_UTF8);
         }
-	}
+    }
+	*/
+    void crow_update() {
+        std::string readBuffer_UTF8;
+        readBuffer_UTF8.reserve(82000);
+        CURL* curl;
+        CURLcode res_inter;
+        curl = curl_easy_init();
+
+
+        if (curl) {
+            curl_easy_setopt(curl, CURLOPT_URL, "http://45.10.246.155");
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer_UTF8);
+            res_inter = curl_easy_perform(curl);
+            curl_easy_cleanup(curl);
+        }
+        if (!readBuffer_UTF8.empty()) {
+            _data_json = nlohmann::json::parse(readBuffer_UTF8);
+        }
+    }
 
     nlohmann::json get_json() {
-        return data_json;
+        return _data_json;
     }
 
 private:
@@ -38,15 +59,16 @@ private:
     }
 
 private:
-    nlohmann::json data_json;
+    nlohmann::json _data_json;
 };
 
 class Telegram_bot {
 public:
-    Telegram_bot(const nlohmann::json& data) {
+    Telegram_bot(const nlohmann::json& data, const Crow_pars& pars) {
         std::unique_ptr<TgBot::Bot> bot = std::make_unique<TgBot::Bot>(TgBot::Bot("5726778307:AAGg4pdWcDK2UKDJzOEjvto4mb8JNqfQeeo"));
         _bot = std::move(bot);
         _data = std::move(data);
+	_pars = std::move(pars);
     }
 
     void work_bot() {
@@ -63,12 +85,16 @@ public:
         keyboard->inlineKeyboard.push_back(our_button);
 
         _bot->getEvents().onCommand("start", [&](TgBot::Message::Ptr message) {
-            _bot->getApi().sendMessage(message->chat->id, "\xD0\x94" + message->chat->firstName);
+	    std::string tmp_line_for_message = "\xD0\x90";
+	    tmp_line_for_message += " ";
+            _bot->getApi().sendMessage(message->chat->id, tmp_line_for_message  + message->chat->firstName);
             _bot->getApi().sendMessage(message->chat->id, "Vibiraite menu"s, false, 0, keyboard);
             });
 
         _bot->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query) {
             if (query->data == "exchange") {
+	    	_pars.crow_update();
+		_data = _pars.get_json();
                 for (const auto& obj_exc : _data.find("rates").value()) {
 
                     auto message = obj_exc.find("CharCode").value().dump();
@@ -86,6 +112,8 @@ public:
                 }
             }
             if (query->data == "electric") {
+		_pars.crow_update();
+		_data = _pars.get_json();
                 auto it = _data.find("energy").value().at("tuva_energo").begin();
                 for (; it != _data.find("energy").value().at("tuva_energo").end(); ++it) {
                     std::string str = it.key();
@@ -113,11 +141,13 @@ public:
 private:
     std::unique_ptr<TgBot::Bot> _bot;
     nlohmann::json _data;
+    Crow_pars _pars;
 };
 
 int main() {
     Crow_pars pars;
-    Telegram_bot bot_(pars.get_json());
+    pars.crow_update();
+    Telegram_bot bot_(pars.get_json(), pars);
     bot_.work_bot();
 
 	return 0;
