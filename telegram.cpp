@@ -8,26 +8,7 @@
 
 class Crow_pars {
 public:
-	/*
-    Crow_pars() {
-        std::string readBuffer_UTF8;
-        readBuffer_UTF8.reserve(82000);
-        CURL* curl;
-        CURLcode res_inter;
-        curl = curl_easy_init();
 
-        if (curl) {
-            curl_easy_setopt(curl, CURLOPT_URL, "http://45.10.246.155");
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer_UTF8);
-            res_inter = curl_easy_perform(curl);
-            curl_easy_cleanup(curl);
-        }
-        if (!readBuffer_UTF8.empty()) {
-            data_json = nlohmann::json::parse(readBuffer_UTF8);
-        }
-    }
-	*/
     void crow_update() {
         std::string readBuffer_UTF8;
         readBuffer_UTF8.reserve(82000);
