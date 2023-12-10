@@ -15,11 +15,11 @@ public:
                 result += ' ';
                 continue;
             }
-            if (ch == 'ё') {
+            if (ch == -72) {
                 result += "\xD1\x91";
                 continue;
             }
-            if (ch == 'Ё') {
+            if (ch == -88) {
                 result += "\xD0\x81";
                 continue;
             }
