@@ -1,5 +1,4 @@
-﻿#include <chrono>
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include <string>
 
@@ -119,9 +118,9 @@ public:
         TgBot::InlineKeyboardButton::Ptr exchange_btn(new TgBot::InlineKeyboardButton);
         TgBot::InlineKeyboardButton::Ptr bc_game_btn(new TgBot::InlineKeyboardButton);
         to_cyrillic trans;
-        electric_btn->text = "Откл-я Тываэнерго";
-        exchange_btn->text = "Курс валют";
-        bc_game_btn->text = "Игра в биткоин";
+        electric_btn->text = trans.trans("Откл-я Тываэнерго");
+        exchange_btn->text = trans.trans("Курс валют");
+        bc_game_btn->text = trans.trans("Игра в биткоин");
         electric_btn->callbackData = "electric"s;
         exchange_btn->callbackData = "exchange"s;
         bc_game_btn->callbackData = "bc_game"s;
@@ -131,8 +130,8 @@ public:
         keyboard->inlineKeyboard.push_back(our_button);
 
         bot_->getEvents().onCommand("start", [&](TgBot::Message::Ptr message) {
-            bot_->getApi().sendMessage(message->chat->id, "Привет " + message->chat->firstName);
-            bot_->getApi().sendMessage(message->chat->id, "Выберете меню", false, 0, keyboard);
+            bot_->getApi().sendMessage(message->chat->id, trans.trans("Привет ") + message->chat->firstName);
+            bot_->getApi().sendMessage(message->chat->id, trans.trans("Выберете меню"), false, 0, keyboard);
             });
 
         bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query) {
@@ -168,29 +167,18 @@ public:
             if (query->data == "bc_game") {
                 TgBot::InlineKeyboardMarkup::Ptr bc_keyboard(new TgBot::InlineKeyboardMarkup);
                 TgBot::InlineKeyboardButton::Ptr up_btn(new TgBot::InlineKeyboardButton), down_btn(new TgBot::InlineKeyboardButton);
-                up_btn->text = "На повышение";
-                down_btn->text = "На понижение";
+                up_btn->text = trans.trans("На повышение");
+                down_btn->text = trans.trans("На понижение");
                 up_btn->callbackData = "up"s;
                 down_btn->callbackData = "down"s;
                 std::vector<TgBot::InlineKeyboardButton::Ptr> bc_button{ up_btn , down_btn };
                 bc_keyboard->inlineKeyboard.push_back(bc_button);
-                bot_->getApi().sendMessage(query->message->chat->id, "На повышение или понижение?", false, 0, bc_keyboard);
+                bot_->getApi().sendMessage(query->message->chat->id, trans.trans("На повышение или понижение?"), false, 0, bc_keyboard);
 
-		try{
-		    bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr bc_query) {
-                    std::thread bc_th(&Telegram_bot::bc_cost, this, query, bc_query);
-                    bc_th.join();
-                    });
-		}
-		catch (std::exception& e){
-		    std::cout << "exc error:" << e.what();
-		}
-		/*
                 bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr bc_query) {
                     std::thread bc_th(&Telegram_bot::bc_cost, this, query, bc_query);
                     bc_th.detach();
                     });
-		    */
             }
             });
 
