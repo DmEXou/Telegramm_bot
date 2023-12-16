@@ -173,7 +173,9 @@ public:
                 for (; it != data_.find("energy").value().at("tuva_energo").end(); ++it) {
                     std::string str = it.key();
                     str += " - ";
-		    //str += it.value()[0];
+                    for (const auto& str_val_station : it.value()) {
+                        str += base_station_.at(std::stoi(str_val_station.dump()));
+                    }
                     bot_->getApi().sendMessage(query->message->chat->id, str);
                 }
             }
@@ -183,35 +185,23 @@ public:
 #ifdef _WIN64
                 up_btn->text = trans.trans("На повышение");
                 down_btn->text = trans.trans("На понижение");
-                up_btn->callbackData = "up"s;
-                down_btn->callbackData = "down"s;
-                std::vector<TgBot::InlineKeyboardButton::Ptr> bc_button{ up_btn , down_btn };
-                bc_keyboard->inlineKeyboard.push_back(bc_button);
-                bot_->getApi().sendMessage(query->message->chat->id, trans.trans("На повышение или понижение?"), false, 0, bc_keyboard);
 #else
                 up_btn->text = "На повышение";
                 down_btn->text = "На понижение";
+#endif
                 up_btn->callbackData = "up"s;
                 down_btn->callbackData = "down"s;
                 std::vector<TgBot::InlineKeyboardButton::Ptr> bc_button{ up_btn , down_btn };
                 bc_keyboard->inlineKeyboard.push_back(bc_button);
+#ifdef _WIN64
+                bot_->getApi().sendMessage(query->message->chat->id, trans.trans("На повышение или понижение?"), false, 0, bc_keyboard);
+#else
                 bot_->getApi().sendMessage(query->message->chat->id, "На повышение или понижение?", false, 0, bc_keyboard);
 #endif
-		try{
-		    bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr bc_query) {
-                    std::thread bc_th(&Telegram_bot::bc_cost, this, query, bc_query);
-                    bc_th.join();
-                    });
-		}
-		catch (std::exception& e){
-		    std::cout << "exc error:" << e.what();
-		}
-		/*
                 bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr bc_query) {
                     std::thread bc_th(&Telegram_bot::bc_cost, this, query, bc_query);
                     bc_th.detach();
                     });
-		    */
             }
             });
 
@@ -230,19 +220,31 @@ public:
                 << localtime(&rawtime)->tm_hour << ":" << localtime(&rawtime)->tm_min << std::endl;
         }
     }
-
+    void set_base_station(const std::map<int, std::string>& tmp_st) {
+        base_station_ = tmp_st;
+    }
 private:
     std::unique_ptr<TgBot::Bot> bot_;
     nlohmann::json data_;
     Crow_pars pars_;
     std::map<std::string, double> bc_;
+    std::map<int, std::string> base_station_;
 };
 
 int main() {
+    std::map<int, std::string> station;
+    to_cyrillic m_trans;
+#ifdef _WIN64
+    station.insert({ {101, m_trans.trans("Шагонар")}, { 102,m_trans.trans("Арыг-Узуу") }, { 201, m_trans.trans("Новый Чаа-Холь") } });
+    station.insert({ { 301, m_trans.trans("Чадан") }, { 302, m_trans.trans("Бажын-Алаак") }, { 401, m_trans.trans("Суг-Аксы") } });
+#else
+    station.insert({ {101, "Шагонар"}, { 102,"Арыг-Узуу" }, { 201, "Новый Чаа-Холь" } });
+    station.insert({ { 301, "Чадан" }, { 302, "Бажын-Алаак" }, { 401, "Суг-Аксы" } });
+#endif 
     Crow_pars pars;
     pars.crow_update();
     Telegram_bot bot_(pars.get_json(), pars);
+    bot_.set_base_station(station);
     bot_.work_bot();
-
 	return 0;
 }
