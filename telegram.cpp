@@ -146,6 +146,9 @@ public:
             bot_->getApi().sendMessage(message->chat->id, "Выберете меню", false, 0, keyboard);
             });
 #endif
+
+        try {
+        //-------------
         bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query) {
             if (query->data == "exchange") {
 	    	    pars_.crow_update();
@@ -204,6 +207,12 @@ public:
                     });
             }
             });
+            //--------------
+            }
+
+            catch (std::exception& e) {
+                std::cerr << "Error - " << e.what();
+            }
 
         try {
             printf("Bot username: %s\n", bot_->getApi().getMe()->username.c_str());
