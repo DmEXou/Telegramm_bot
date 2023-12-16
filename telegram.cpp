@@ -162,6 +162,7 @@ public:
                 for (; it != data_.find("energy").value().at("tuva_energo").end(); ++it) {
                     std::string str = it.key();
                     str += " - ";
+		    //str += it.value()[0];
                     bot_->getApi().sendMessage(query->message->chat->id, str);
                 }
             }
