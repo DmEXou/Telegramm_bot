@@ -85,7 +85,7 @@ public:
         std::unique_ptr<TgBot::Bot> bot = std::make_unique<TgBot::Bot>(TgBot::Bot("5726778307:AAGg4pdWcDK2UKDJzOEjvto4mb8JNqfQeeo"));
         bot_ = std::move(bot);
         data_ = std::move(data);
-	    pars_ = std::move(pars);
+	pars_ = std::move(pars);
     }
 
     void bc_cost(TgBot::CallbackQuery::Ptr query, TgBot::CallbackQuery::Ptr bc_query) {
@@ -173,6 +173,7 @@ public:
 	            pars_.crow_update();
 	            data_ = pars_.get_json();
                 auto it = data_.find("energy").value().at("tuva_energo").begin();
+		if(it->is_array()){
                 for (; it != data_.find("energy").value().at("tuva_energo").end(); ++it) {
                     std::string str = it.key();
                     str += " - ";
@@ -182,6 +183,14 @@ public:
                     bot_->getApi().sendMessage(query->message->chat->id, str);
                 }
             }
+		else{
+#ifdef _WIN64
+		    bot_->getApi().sendMessage(query->message->chat->id, trans.trans("Отключений не найдено"));
+#else
+		    bot_->getApi().sendMessage(query->message->chat->id, "Отключений не найдено");
+#endif
+		}
+	    }
             if (query->data == "bc_game") {
                 TgBot::InlineKeyboardMarkup::Ptr bc_keyboard(new TgBot::InlineKeyboardMarkup);
                 TgBot::InlineKeyboardButton::Ptr up_btn(new TgBot::InlineKeyboardButton), down_btn(new TgBot::InlineKeyboardButton);
@@ -255,5 +264,5 @@ int main() {
     Telegram_bot bot_(pars.get_json(), pars);
     bot_.set_base_station(station);
     bot_.work_bot();
-	return 0;
+    return 0;
 }
