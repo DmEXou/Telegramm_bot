@@ -179,6 +179,7 @@ public:
                     str += " - ";
                     for (const auto& str_val_station : it.value()) {
                         str += base_station_.at(std::stoi(str_val_station.dump()));
+			str += " ";
                     }
                     bot_->getApi().sendMessage(query->message->chat->id, str);
                 }
