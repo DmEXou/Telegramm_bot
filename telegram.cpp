@@ -147,8 +147,6 @@ public:
             });
 #endif
 
-        try {
-        //-------------
         bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query) {
             if (query->data == "exchange") {
 	    	    pars_.crow_update();
@@ -183,6 +181,7 @@ public:
                 }
             }
             if (query->data == "bc_game") {
+
                 TgBot::InlineKeyboardMarkup::Ptr bc_keyboard(new TgBot::InlineKeyboardMarkup);
                 TgBot::InlineKeyboardButton::Ptr up_btn(new TgBot::InlineKeyboardButton), down_btn(new TgBot::InlineKeyboardButton);
 #ifdef _WIN64
@@ -201,18 +200,8 @@ public:
 #else
                 bot_->getApi().sendMessage(query->message->chat->id, "На повышение или понижение?", false, 0, bc_keyboard);
 #endif
-                bot_->getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr bc_query) {
-                    std::thread bc_th(&Telegram_bot::bc_cost, this, query, bc_query);
-                    bc_th.detach();
-                    });
             }
             });
-            //--------------
-            }
-
-            catch (std::exception& e) {
-                std::cerr << "Error - " << e.what();
-            }
 
         try {
             printf("Bot username: %s\n", bot_->getApi().getMe()->username.c_str());
