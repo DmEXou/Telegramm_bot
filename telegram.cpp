@@ -60,9 +60,13 @@ public:
             res_inter = curl_easy_perform(curl);
             curl_easy_cleanup(curl);
         }
-        if (!readBuffer_UTF8.empty()) {
+
+        if (!readBuffer_UTF8.empty() || readBuffer_UTF8.size() >= 50) {
             _data_json = nlohmann::json::parse(readBuffer_UTF8);
         }
+	else{
+	    _data_json["status"] = "error";
+	}
     }
 
     nlohmann::json get_json() {
