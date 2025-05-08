@@ -7,6 +7,10 @@
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 
+#ifdef _WIN64
+    #pragma warning(disable : 4996)
+#endif
+
 class to_cyrillic {
 public:
     std::string trans(const std::string& str) {
@@ -86,7 +90,7 @@ private:
 class Telegram_bot {
 public:
     Telegram_bot(const nlohmann::json& data, const Crow_pars& pars) {
-        std::unique_ptr<TgBot::Bot> bot = std::make_unique<TgBot::Bot>(TgBot::Bot("5726778307:AAGg4pdWcDK2UKDJzOEjvto4mb8JNqfQeeo"));
+        std::unique_ptr<TgBot::Bot> bot = std::make_unique<TgBot::Bot>(TgBot::Bot("7858812821:AAGMK10UKSTNgiuNSPhMlj3vkOoT6xg9n9w"));
         bot_ = std::move(bot);
         data_ = std::move(data);
 	    pars_ = std::move(pars);
