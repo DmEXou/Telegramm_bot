@@ -89,8 +89,9 @@ private:
 
 class Telegram_bot {
 public:
-    Telegram_bot(const nlohmann::json& data, const Crow_pars& pars) {
-        std::unique_ptr<TgBot::Bot> bot = std::make_unique<TgBot::Bot>(TgBot::Bot("7858812821:AAGMK10UKSTNgiuNSPhMlj3vkOoT6xg9n9w"));
+    Telegram_bot(const nlohmann::json& data, const Crow_pars& pars, const std::string& tokken) {
+
+        std::unique_ptr<TgBot::Bot> bot = std::make_unique<TgBot::Bot>(TgBot::Bot(tokken.data()));
         bot_ = std::move(bot);
         data_ = std::move(data);
 	    pars_ = std::move(pars);
@@ -232,7 +233,7 @@ public:
         catch (TgBot::TgException& e) {
             time_t rawtime;
             time(&rawtime);
-            std::cout << "error: %s\n" << e.what() << " - " << localtime(&rawtime)->tm_mday << " " 
+            std::cout << "error: code error = " << std::size_t(e.errorCode) << " - " << e.what() << " day " << " - " << localtime(&rawtime)->tm_mday << " time "
                 << localtime(&rawtime)->tm_hour << ":" << localtime(&rawtime)->tm_min << std::endl;
         }
     }
@@ -259,7 +260,15 @@ int main() {
 #endif 
     Crow_pars pars;
     pars.crow_update();
-    Telegram_bot bot_(pars.get_json(), pars);
+
+    std::ifstream in;
+    in.open("tokken.txt");
+    std::string tokken;
+    tokken.reserve(47);
+    in.getline(tokken.data(), 47);
+    in.close();
+
+    Telegram_bot bot_(pars.get_json(), pars, tokken);
     bot_.set_base_station(station);
     bot_.work_bot();
 	return 0;
